@@ -8,11 +8,12 @@ header:
   teaser: /assets/images/htb-forest/forest1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
   - AD
   - Windows  
+  - kerberos
 ---
 
 ![](/assets/images/htb-forest/forest1.png)

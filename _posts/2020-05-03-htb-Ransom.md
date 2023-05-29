@@ -5,13 +5,14 @@ excerpt: "Bypass de SSRF"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-forge/forge1.png
+  teaser: /assets/images/htb-ransom/ransom1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - SSRF  
+  - Cracking
+  - PHP 
 ---
 
 # 10.10.11.153 - Ransom

@@ -8,11 +8,12 @@ header:
   teaser: /assets/images/htb-inteligence/inteligence1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
   - AD
-  - Windows  
+  - Windows 
+  - metadatos 
 ---
 
 # 10.10.10.248  - Inteligence
@@ -23,15 +24,15 @@ tags:
 
 ## Part 1: Reconocimiento inicial
 
-Puertos abiertos -> 88(kerberos), 135(rcp), 139(netbios), 389,636(ldap), 445(smb), 464 ,593(rcp oer http), 636.   
+Puertos abiertos -> `88(kerberos), 135(rcp), 139(netbios), 389,636(ldap), 445(smb), 464 ,593(rcp oer http), 636`   
 Nmap nos dice que el dominio se llama **intelligence.htb** o **dc.intelligence.htb**.  
 Como tenemos un nombre de dominio, lo añadimos al /etc/hosts.  
 
-El rpc no nos deja hacer nada sin credenciales ```rpcclient -U "" 10.10.10.248 -N```  
-El smb igual ```smbmap -H 10.10.10.248 -u "test" # [!] Authentication error on 10.10.10.248```  
+- El rpc no nos deja hacer nada sin credenciales `rpcclient -U "" 10.10.10.248 -N`  
+- El smb igual `smbmap -H 10.10.10.248 -u "test" # [!] Authentication error on 10.10.10.248`    
 
 Como tneemos el puerto 88 abierto intentamos hacer fuzzing de nombres:  
-```kerbrute userenum --dc 10.10.10.248 -d intelligence.htb /usr/share/seclists/Usernames/Names/names.txt```  
+`kerbrute userenum --dc 10.10.10.248 -d intelligence.htb /usr/share/seclists/Usernames/Names/names.txt`  
 Pero no da resultado.  
 
 ![](/assets/images/htb-inteligence/inteligence2.PNG)
@@ -45,6 +46,7 @@ La unica ruta que hay es /documents pero da error 403.
 
 Hay una parte para descargas que lleva a varios pdfs:  
 ![](/assets/images/htb-inteligence/inteligence3.PNG)
+
 ```
 http://intelligence.htb/documents/2020-01-01-upload.pdf  # Lo mismo
 http://intelligence.htb/documents/2020-12-15-upload.pdf  # Texto de prueba en latin

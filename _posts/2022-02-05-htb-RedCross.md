@@ -8,11 +8,15 @@ header:
   teaser: /assets/images/htb-forest/forest1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - AD
+  - binarios
+  - ROP
   - Windows  
+  - XSS
+  - Command-Injection
+
 ---
 
 

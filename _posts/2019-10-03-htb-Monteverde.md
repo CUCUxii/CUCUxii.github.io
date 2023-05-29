@@ -1,18 +1,21 @@
 ---
 layout: single
-title: Forest - Hack The Box
+title: Monteverde - Hack The Box
 excerpt: "Tocamos directorio activo"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-forest/forest1.png
+  teaser: /assets/images/htb-monteverde/monteverde1.png
 categories:
   - hackthebox
   - infosec
 tags:
   - hackthebox
   - AD
-  - Windows  
+  - Windows 
+  - RPC
+  - Kerberos
+  - Azure 
 ---
 
 # 10.10.10.172 - Monteverde

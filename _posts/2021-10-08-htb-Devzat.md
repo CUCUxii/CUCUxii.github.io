@@ -8,10 +8,11 @@ header:
   teaser: /assets/images/htb-devzat/devzat1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - binary exploit  
+  - Git
+  - script exploitation 
 ---
 
 ![](/assets/images/htb-devzat/devzat1.png)

@@ -1,17 +1,17 @@
 ---
 layout: single
 title: Haircut - Hack The Box
-excerpt: "SSRF"
+excerpt: "CTF clásico de HTB, SSRF y busqueda de como explotar un comando SUID en el sistema"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-forge/forge1.png
+  teaser: /assets/images/htb-haircut/haircut1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - SSRF  
+  - SUID binary 
 ---
 
 

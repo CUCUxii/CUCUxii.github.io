@@ -8,10 +8,11 @@ header:
   teaser: /assets/images/htb-awkward/awkward1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - binary exploit  
+  - JWT
+  - Docker
 ---
 
 # 10.10.10.230 - TheNotebook

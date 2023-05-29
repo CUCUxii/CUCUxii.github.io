@@ -1,7 +1,7 @@
 ---
 layout: single
 title: UpDown - Hack The Box
-excerpt: "Esta máquina ha sido algo complicada, sobre todo por el tema de enumeración y encontrar rutas ocultas y mucha explotación web"
+excerpt: "Tocamos vulnerabilidades web, entre ellas una manera de bypass de subida de archivos con el wrapper phar"
 date: 2018-11-24
 classes: wide
 header:
@@ -11,7 +11,10 @@ categories:
   - infosec
 tags:
   - hackthebox
-  - binary exploit  
+  - LFI
+  - File-Upload
+  - Git
+  - Python2  
 ---
 
 # 10.10.11.177 - Updown

