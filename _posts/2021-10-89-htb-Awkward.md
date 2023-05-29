@@ -13,12 +13,11 @@ tags:
   - binary exploit  
 ---
 
-
-# 10.10.11.185 - Akward
-
 ![](/assets/images/htb-awkward/awkward1.png)
 
 -----------------------
+# Akward - 10.10.11.185 
+
 Disclaimer: En partes de esta maquina he tenido que tirar de Writeups porque mas que media ha sido bastante hard.
 
 ## Part 1:Enumeracion

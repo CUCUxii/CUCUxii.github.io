@@ -13,16 +13,10 @@ tags:
   - binary exploit  
 ---
 
-## Linux / 10.10.10.89
-
 ![](/assets/images/htb-devzat/devzat1.png)
 
-This blog post is a writeup of the excellent Hack the Box machine created by dzonerzy.
-
-10.10.11.118 - Devzat
-
-
 ---------------------
+# Devzat - 10.10.10.89 
 
 ## Part 1: Reconocimiento inicial
 
