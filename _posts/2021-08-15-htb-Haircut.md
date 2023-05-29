@@ -14,10 +14,8 @@ tags:
   - SUID binary 
 ---
 
-
 # 10.10.10.24 - Haircut
 ![](/assets/images/htb-haircut/haircut1.png)
-
 
 ------------
 # Part 1: Enumeración
