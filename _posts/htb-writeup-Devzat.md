@@ -4,7 +4,7 @@ title: Devzat - Hack The Box
 date: 2023-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-writeup-smasher/smasher.png
+  teaser: /assets/images/htb-devzat/devzat1.png
 categories:
   - hackthebox
   - infosec
@@ -16,7 +16,7 @@ tags:
 
 10.10.11.118 - Devzat
 
-![Devzat](https://user-images.githubusercontent.com/96772264/200538019-e9d8a804-ead3-46cd-9b17-fb4f3d53018b.png)
+![](/assets/images/htb-devzat/devzat1.png)
 
 ---------------------
 
