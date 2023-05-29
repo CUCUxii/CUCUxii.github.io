@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "haxor" # "air", "aqua", "contrast", "dark", "dirt", 
 
 # Site Settings
 locale                   : "en-US"
-title                    : "cucuxii.io"
+title                    : "cucuxii.github.io"
 title_separator          : "-"
 name                     : "CUCUxii"
 description              : "CTFs / ciberseguridad / RedTeam"
@@ -101,7 +101,7 @@ analytics:
 
 # Site Author
 author:
-  name             : "Snowscan"
+  name             : "Cucuxii"
   avatar           : "/assets/images/avatar.png"
   bio              : "Pentester, CTF player<br>HackTheBox ATeam"
   location         : "Canada"
