@@ -21,7 +21,6 @@ This blog post is a writeup of the excellent Hack the Box machine created by dzo
 
 10.10.11.118 - Devzat
 
-![Devzat](https://user-images.githubusercontent.com/96772264/200538019-e9d8a804-ead3-46cd-9b17-fb4f3d53018b.png)
 
 ---------------------
 
@@ -30,7 +29,8 @@ This blog post is a writeup of the excellent Hack the Box machine created by dzo
 Puertos abiertos 22(ssh), 80(http) y 8000(apache, pero no responde):  
 - El scaneo de nmap ha revelado el dominio ```http://devzat.htb/```  
 
-![devzat1](https://user-images.githubusercontent.com/96772264/200538123-3a41ea42-4018-42e1-b6e3-e358ce38f054.PNG)
+![](/assets/images/htb-devzat/devzat2.png)
+
 
 La web del puerto 80 "devzat" habla de una aplicación de chat:  
 - Dice que esta programada por el creador de la web (un tal patrick) supuestamente.  
@@ -67,7 +67,7 @@ cucuxii: /id # -> ip hasheada, me sale df6f2999ac39225cf81260719423b5a2572ff7b38
 Como no hay nada interesante, en ambas webs trato de buscar la carpeta /.git (porque antes mencionaban lo de las branches y la version inestable).  
 Este .git existe en el de pets.  
 
-![devzat1](https://user-images.githubusercontent.com/96772264/200538205-71d74bc3-1fbc-4c39-b329-81758c318486.PNG)
+![](/assets/images/htb-devzat/devzat3.png)
 
 Hay una herramienta para armar los repos llamada git-dumper ```sudo pip install git-dumper```  
 ```console
@@ -93,7 +93,7 @@ O sea si species es *gato* pues te sale lo del *gato*.
 En la web hay una sección para elegir un animal y que se añada a la lista con la descripción.    
 Ej si pones un perro llamado "Pizarro" se añadira con la descripción del perro de la carpeta **/characteristicas**  
 
-![devzat3](https://user-images.githubusercontent.com/96772264/200538269-59677299-2982-4327-8aef-d2c4588abbd5.PNG)
+![](/assets/images/htb-devzat/devzat4.png)
 
 Añadimos un gato llamado "Benito":  
 ```/POST a http://pets.devzat/api/pet {"name":"Benito","species":"cat"}```
