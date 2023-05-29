@@ -1,10 +1,11 @@
 ---
 layout: single
 title: Devzat - Hack The Box
+excerpt: "Aqui explotamos un repo de Github y una aplicacion personalizada"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-writeup-smasher/smasher.png
+  teaser: /assets/images/htb-devzat/devzat1.png
 categories:
   - hackthebox
   - infosec
