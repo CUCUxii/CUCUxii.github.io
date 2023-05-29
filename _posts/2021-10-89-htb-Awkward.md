@@ -1,10 +1,11 @@
 ---
 layout: single
 title: Awkward - Hack The Box
+excerpt: "Esta máquina ha sido algo complicada, sobre todo por el tema de enumeración y encontrar rutas ocultas y mucha explotación web"
 date: 2018-11-24
 classes: wide
 header:
-  teaser: /assets/images/htb-writeup-smasher/smasher.png
+  teaser: /assets/images/htb-awkward/awkward1.png
 categories:
   - hackthebox
   - infosec
