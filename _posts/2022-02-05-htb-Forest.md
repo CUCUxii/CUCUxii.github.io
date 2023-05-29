@@ -148,7 +148,7 @@ El tema grupos es muy importante en directorio activo.
 [+] Domain dump finished
 ```
 
-![](/assets/images/htb-forest/forest2.png)
+![](/assets/images/htb-forest/forest2.PNG)
 
 En Remote Management Users están los de "Privileged IT Accounts" que a su vez están los de "Service Account" al
 que pertenecía nuestro usuario (por eso se pudo acceder al winrm).
@@ -173,12 +173,12 @@ En kali nos ponemos en escucha por python.
 
 Subimos esto a la herramienta y le marcamos a svc-alfresco como pwneado. Este es el esquema del dominio:
 
-![](/assets/images/htb-forest/forest3.png)
+![](/assets/images/htb-forest/forest3.PNG)
 
 En **Reachable hight value targets** nos dice que pertenece a Exchange Windows Permissions 
 (o sea que tenemos el privilegio de cambiar los permisos a nuestro gusto, puediendo cambiar el Dacl y asi dumpear los hashes con el secresdump)
 
-![](/assets/images/htb-forest/forest4.png)
+![](/assets/images/htb-forest/forest4.PNG)
 
 Para cierta funcion *Add-DomainObjectAcl* necesitamos este otro [script](https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1)
 
