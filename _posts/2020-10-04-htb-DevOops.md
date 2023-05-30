@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Devzat - Hack The Box
+title: DevOops - Hack The Box
 excerpt: "Maquina sencillita. XML y encontrar un repo Git con credenciales leakeadas"
 date: 2018-11-24
 classes: wide
