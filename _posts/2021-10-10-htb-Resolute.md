@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Awkward - Hack The Box
+title: Resolute - Hack The Box
 excerpt: "Máquina Windiws AD muy sencilla"
 date: 2018-11-24
 classes: wide
