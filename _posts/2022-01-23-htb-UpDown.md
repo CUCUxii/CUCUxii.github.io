@@ -8,7 +8,7 @@ header:
   teaser: /assets/images/htb-awkward/awkward1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
   - LFI

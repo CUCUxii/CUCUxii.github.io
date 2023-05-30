@@ -8,7 +8,7 @@ header:
   teaser: /assets/images/htb-monteverde/monteverde1.png
 categories:
   - hackthebox
-  - infosec
+  - writeup
 tags:
   - hackthebox
   - AD
