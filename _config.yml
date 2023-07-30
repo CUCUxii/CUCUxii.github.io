@@ -16,9 +16,9 @@ minimal_mistakes_skin    : "haxor" # "air", "aqua", "contrast", "dark", "dirt", 
 
 # Site Settings
 locale                   : "en-US"
-title                    : "cucuxii.github.io"
+title                    : "jessica-diaz-ciber.github.io"
 title_separator          : "-"
-name                     : "CUCUxii"
+name                     : "Jessica Diaz"
 description              : "CTFs / ciberseguridad / RedTeam"
 url                      : "https://cucuxii.github.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
