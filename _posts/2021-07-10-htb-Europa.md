@@ -1,6 +1,6 @@
 # 10.10.10.22 - Europa
 
-![](/assets/images/htb-europa/europa1.PNG)
+![](/assets/images/htb-europa/europa1.png)
 
 --------------------
 # Part 1: Reconocimiento inicial  
@@ -41,7 +41,7 @@ https://admin-portal.europacorp.htb/login.php [200 OK] Apache[2.4.18], Bootstrap
 Nos da un panel de login, sabemos que el admin es ```admin@europacorp.htb``` Nos viene muy bien tenerlo porque si ponemos un usaurio que no existe no hay ninguna 
 respuesta diferente.  
 
-![europa1](https://user-images.githubusercontent.com/96772264/200188004-93fa3891-b839-46de-a777-687bf6604c9b.PNG)
+![](/assets/images/htb-europa/europa2.PNG)
 
 Si intentamos una inyeccion sqli ```admin@europacorp.htb' or 1=1-- -``` nos dice que metamos una direccion de correo. Eso lo pone en el navegador pero si  
 intentamos de otra manera puede que nos lo saltemos.  
@@ -183,10 +183,10 @@ Consigo la ```PHPSESSID:vfhb3ig3s0n01o9mp2arg735k0```
 # Part 4: Admin panel 
 Estamos en el panel de adminsitración, hay dos partes "tools" y "admin". 
 
-![europa2](https://user-images.githubusercontent.com/96772264/200188111-fa2360a2-771c-459e-868e-237945585e22.PNG)
+![](/assets/images/htb-europa/europa3.PNG)
 
 En tools hay como un fichero de configuración de conexiones. Si interceptamos con buprsuite (y urldecodeamos) vemos que se envia POST a /tools.php  
-![europa3](https://user-images.githubusercontent.com/96772264/200188120-c0be7d86-5702-4866-a084-cb622bf356a6.PNG)
+![](/assets/images/htb-europa/europa4.PNG)
 ```pattern=/ip_address/&ipaddress=test&text="openvpn": { #json largo }``` 
 Si escripteamos la petición para experimentar:    
 ```python
