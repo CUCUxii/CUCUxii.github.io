@@ -83,7 +83,8 @@ Las blind sqli se basan en la función substr:
 > `substr(‘palabra’, 1,1) -> “p”; substr(‘palabra’, 2,2)` → “al”    
 > `and if (substr(‘palabra’, 1,1)='p', sleep(5),1)-- -` si la primera letra de 'palabra' es 'p', espera 5 segundos.
 
-## Averiguar el nombre de la base de datos actual:  
+
+## Averiguar el nombre de la base de datos actual:    
 
 ```python
 #!/bin/python3
