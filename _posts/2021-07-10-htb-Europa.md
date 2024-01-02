@@ -1,3 +1,19 @@
+---
+layout: single
+title: Europa - Hack The Box
+excerpt: Tocamos Blind SQLI"
+date: 2018-11-24
+classes: wide
+header:
+  teaser: /assets/images/htb-europa/europa1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - blind sqli
+---
+
 # 10.10.10.22 - Europa
 
 ![](/assets/images/htb-europa/europa1.png)
