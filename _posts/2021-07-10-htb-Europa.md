@@ -80,8 +80,8 @@ print(req.text)
 Probamos otro tipo de inyeccion (tiempo) -> ```' and sleep(5)-- -```  
 Ejecutamos el script y tarda cinco segundos en responder, eso esque hay una vulnerabilidad **time based blind sqli**  
 Las blind sqli se basan en la función substr:   
-> `substr(‘palabra’, 1,1) -> “p”; substr(‘palabra’, 2,2)` → “al”    
-> `and if (substr(‘palabra’, 1,1)='p', sleep(5),1)-- -` si la primera letra de 'palabra' es 'p', espera 5 segundos.
+- `substr(‘palabra’, 1,1) -> “p”; substr(‘palabra’, 2,2)` → “al”    
+- `and if (substr(‘palabra’, 1,1)='p', sleep(5),1)-- -` si la primera letra de 'palabra' es 'p', espera 5 segundos.
 
 -----------------------------
 
