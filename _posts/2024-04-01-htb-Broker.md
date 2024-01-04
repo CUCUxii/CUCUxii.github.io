@@ -2,7 +2,7 @@
 layout: single
 title: Broker - Hack The Box
 excerpt: "Una maquina sencilla que implica una vulnerabilidad bastante reciente"
-date: 2023-04-01
+date: 2024-04-01
 classes: wide
 header:
   teaser: /assets/images/htb-monteverde/monteverde1.png
