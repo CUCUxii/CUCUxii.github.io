@@ -1,3 +1,20 @@
+---
+layout: single
+title: Broker - Hack The Box
+excerpt: "Una maquina sencilla que implica una vulnerabilidad bastante reciente"
+date: 2023-04-01
+classes: wide
+header:
+  teaser: /assets/images/htb-monteverde/monteverde1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - Linux
+  - ActiveMq 
+  - nginx
+---
 
 # Enumeración inicial
 
