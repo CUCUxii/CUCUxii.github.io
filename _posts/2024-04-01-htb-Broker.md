@@ -15,9 +15,9 @@ tags:
   - ActiveMq 
   - nginx
 ---
+![](/assets/images/htb-broker/broker1.jpg)
 
 # Enumeración inicial
-![](/assets/images/htb-broker/broker1.jpg)
 
 ```bash
 :$ sudo nmap -Pn -n -vvv -p- --open -sS 10.10.11.243 --min-rate 5000 -sCV
@@ -49,7 +49,9 @@ PORT      STATE SERVICE     REASON         VERSION
 > A. La 5.15.15  
 
 - Aparte hay un montón de puertos en los que se comparte el sistema de archivos entero  
-- Intento descargar algunos archivos de linux (`/etc/shadow`, `/etc/passwd`), correr el comando `unshadow` y crackear el hash, pero fracasamos.  
+- Intento descargar algunos archivos de linux (`/etc/shadow`, `/etc/passwd`), correr el comando `unshadow` y crackear el hash, pero fracasamos.
+
+![](/assets/images/htb-broker/broker2.png)
 
 ```bash
 $: curl -s http://10.10.11.243:81/etc/shadow | grep -E "activemq|root" > shadow
@@ -70,6 +72,8 @@ Es internet nos lo definen como un broker de mensajes (al principio creia que se
 Con mensajes nos referimos a la trasnferencia de datos estrcuturados (XML, JSON u objetos serializados) para que aplicaciones se comuniquen entre si. 
 El broker de mensajes, (`ActiveMQ`), actúa como un intermediario que facilita y gestiona dicha comunicación (enruta mensajes de una aplicación a 
 otra y adapta el formato del mensaje para que le sea legible)
+
+![](/assets/images/htb-broker/activemq.png)
 
 Si una aplicación Cliente utiliza Java como lenguaje, se comunica con el broker ActiveMQ por el protocolo `OpenWire`, mediante datos en binario
 
