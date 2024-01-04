@@ -17,6 +17,7 @@ tags:
 ---
 
 # Enumeración inicial
+![](/assets/images/htb-broker/broker1.jpg)
 
 ```bash
 :$ sudo nmap -Pn -n -vvv -p- --open -sS 10.10.11.243 --min-rate 5000 -sCV
