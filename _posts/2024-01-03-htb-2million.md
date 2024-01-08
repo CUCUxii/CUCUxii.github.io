@@ -1,5 +1,26 @@
+---
+layout: single
+title: Ransom - Hack The Box
+excerpt: "Explotación de Api"
+date: 2024-01-03
+classes: wide
+header:
+  teaser: /assets/images/htb-ransom/ransom1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - nginx
+  - API
+  - kernel
+---
 
+# 10.10.11.221 TwoMillion
 
+![](/assets/images/htb-2million/2million1.jpg)
+
+----------------------------
 # 1. Reconocimiento
 
 Hacemos un escaneo de puertos con nmap
@@ -213,7 +234,7 @@ www-data@2million:/var/www/html$ grep -ri "password"
 .env:DB_PASSWORD=SuperDuperPass123
 ...
 ```
-Por tanto ya podemos hacer ssh como admin 
+El archivo `.env` es el tiene información de configuración de servidores nginx. Por tanto ya podemos hacer ssh como admin 
 
 ```bash
 $: ssh admin@2million.htb
