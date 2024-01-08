@@ -18,7 +18,7 @@ tags:
 
 # 10.10.11.221 TwoMillion
 
-![](/assets/images/htb-2million/2million1.jpg)
+![](/assets/images/htb-2million/2million1.png)
 
 ----------------------------
 # 1. Reconocimiento
