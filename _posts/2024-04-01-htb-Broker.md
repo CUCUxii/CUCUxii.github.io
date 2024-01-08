@@ -15,7 +15,12 @@ tags:
   - ActiveMq 
   - nginx
 ---
+
+# 10.10.11.243 Broker
+
 ![](/assets/images/htb-broker/broker1.jpg)
+
+--------------------
 
 # Enumeración inicial
 
