@@ -45,8 +45,7 @@ kovboNzcw9vHsBwvPX3KYA3cxGbKiA0VqbKRpOHnpsMuHEXEVJc=
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-Como pone "2million.htb" vamos a asociar este dominio a la ip en `/etc/hosts`
-En whatweb nos dice que es un `nginx`
+Como pone "2million.htb" vamos a asociar este dominio a la ip en `/etc/hosts`. En whatweb nos dice que es un `nginx`
 
 ```bash
 $: whatweb http://2million.htb/  
@@ -54,6 +53,7 @@ http://2million.htb/ [200 OK] Cookies[PHPSESSID], Country[RESERVED][ZZ], Email[i
 L5, HTTPServer[nginx], IP[10.10.11.221], Meta-Author[Hack The Box], Script, Title[Hack The Box :: Penetration 
 Testing Labs], X-UA-Compatible[IE=edge], YouTube, nginx
 ```
+![](/assets/images/htb-2million/2million2.png)
 Si hacemos fuzzing vemos los directorios:
 
 ```bash
@@ -92,6 +92,7 @@ rror|data|var|verifyInviteCode|makeInviteCode|how|to|generate|verify'.split('|')
 ```
 
 Si vamos a [de4js](https://lelinhtinh.github.io/de4js/) podremos de-ofuscar el codigo, quedando así:
+![](/assets/images/htb-2million/2million3.png)
 
 ```bash
 $: cat inviteapi.js 
@@ -141,6 +142,11 @@ GM4WF-7HAMX-OJDP8-RWFTE
 ```
 YA hemos conseguido el código, asi que nos registramos en la web con ese código en `/invite` lo que nos redirige a la web de `/login` de ahí a `/register` y de ahi pasamos a `/login`
 Se nos setea la cookie `PHPSESSID=bq0vegd024sflnvbpvro6ccmri`, que usaremos para interactuar con la api
+
+![](/assets/images/htb-2million/2million4.png)
+![](/assets/images/htb-2million/2million5.png)
+![](/assets/images/htb-2million/2million6.png)
+![](/assets/images/htb-2million/2million7.png)
 
 ```bash
 $: curl -s http://2million.htb/api --cookie "PHPSESSID=bq0vegd024sflnvbpvro6ccmri"
