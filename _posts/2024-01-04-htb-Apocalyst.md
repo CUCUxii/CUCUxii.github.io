@@ -1,8 +1,8 @@
 ---
 layout: single
-title: TwoMillion - Hack The Box
-excerpt: "Explotación de Api"
-date: 2024-01-03
+title: Apocalyst - Hack The Box
+excerpt: "Steganografía"
+date: 2024-01-04
 classes: wide
 header:
   teaser: /assets/images/htb-apocalyst/apocalyst1.png
@@ -11,9 +11,9 @@ categories:
   - writeup
 tags:
   - hackthebox
-  - nginx
-  - API
-  - kernel
+  - wordpress
+  - Linux
+  - stego
 ---
 
 # 10.10.10.46 - Apocalist
