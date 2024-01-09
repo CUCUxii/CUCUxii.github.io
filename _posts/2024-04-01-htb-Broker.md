@@ -5,7 +5,7 @@ excerpt: "Una maquina sencilla que implica una vulnerabilidad bastante reciente"
 date: 2024-04-01
 classes: wide
 header:
-  teaser: /assets/images/htb-monteverde/monteverde1.png
+  teaser: /assets/images/htb-broker/broker1.jpg
 categories:
   - hackthebox
   - writeup
