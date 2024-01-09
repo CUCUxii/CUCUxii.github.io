@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Ransom - Hack The Box
+title: TwoMillion - Hack The Box
 excerpt: "Explotación de Api"
 date: 2024-01-03
 classes: wide
