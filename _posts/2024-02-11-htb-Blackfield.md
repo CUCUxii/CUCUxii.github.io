@@ -40,7 +40,7 @@ Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
 ```
 
 Ahora con smb haremos un pequeño reconocimiento de sistema operativo y el nombre de dominio, nos sale "Blackfield.local", que 
-incluiremos en el `/etc/hosts` asociado a su IP (`sudo echo -e "10.10.10.192\tblackfield.local" >> /etc/hosts`)
+incluiremos en el `/etc/hosts` asociado a su IP (`echo -e "10.10.10.192\tblackfield.local" >> /etc/hosts`)
 ```bash
 └─$ nxc smb 10.10.10.192
 SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
