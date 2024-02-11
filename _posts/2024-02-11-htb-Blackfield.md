@@ -142,6 +142,7 @@ INFO: Found 316 users
 --------------------
 # Parte 4: Escalando privilegios
 
+![](/assets/images/htb-blackfield/blackfield2.png)
 Vemos que support tiene el derecho (ACL) de `Force-ChangePassword` sobre "audit2020". La manera de explotar esta ACL desde fuera
 de la máquina es por rpcclient con el comando `'setuserinfo2 <usaurios> 23 <contraseña>'`. Comprobamos con nxc si las 
 credenciales han cambiado y sí.
@@ -228,7 +229,8 @@ SeBackupPrivilege             Back up files and directories  Enabled
 --------------------
 # Parte 5: Comprometiendo el dominio entero
 
-Como svc_backup tiene el ACL `SeBackupPrivilege` podemos hacer copias de archivos protegidos aunque no tengamos derechos sobre
+![](/assets/images/htb-blackfield/blackfield3.png)
+Como svc_backup tiene el ACL `SeBackupPrivilege` (ya que pertenece al grupo `BackupOperators`) podemos hacer copias de archivos protegidos aunque no tengamos derechos sobre
 ellos (nos saltamos sus ACLs por tanto). Podemos obtener las credenciales de todo el systema, guardandonos con `reg save` 
 la clave de registro `system` ("bootkey del sistema")
 ```bash
