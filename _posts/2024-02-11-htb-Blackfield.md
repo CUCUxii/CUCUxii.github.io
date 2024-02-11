@@ -125,7 +125,7 @@ $krb5asrep$23$support@BLACKFIELD.LOCAL:8713342...:#00^BlackKnight
 
 Ahora al tener credenciales, podemos por ejemplo obtener mas información por ldap (con ldapdomaindump o bloodhound-python
 ya que ldapseach devuelve mas de 20000 lineas de output). En este caso optamos por bloodhound y los archivos ".json" que
-genere, los metemos en "info.zip" (`zip info.zip *.json`), el cual subiremos a la herramienta bloodhound (ya sabemos, para ejecutarlo es `sudo neo4j console` y `bloodhound &> &; disown`)
+genere, los metemos en "info.zip" (`zip info.zip *.json`), el cual subiremos a la herramienta bloodhound (ya sabemos, para ejecutarlo es `sudo neo4j console` y `bloodhound &>/dev/null &; disown`)
 
 ```bash
 └─$ bloodhound-python -u 'support' -p "#00^BlackKnight" -ns 10.10.10.192 -d blackfield.local -c all
