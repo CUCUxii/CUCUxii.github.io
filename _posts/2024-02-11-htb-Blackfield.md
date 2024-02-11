@@ -18,7 +18,7 @@ tags:
 
 # 10.10.10.192 - Blackfield
 
-![](/assets/images/htb-blackfield/blackfield1)
+![](/assets/images/htb-blackfield/blackfield1.png)
 
 --------------------
 # Parte 1: Reconocimiento inicial
