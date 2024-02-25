@@ -1,4 +1,26 @@
-## Part 1: Reconocimiento inicial
+---
+layout: single
+title: Streamio - Hack The Box
+excerpt: "Windows SQLI"
+date: 2024-02-25
+classes: wide
+header:
+  teaser: /assets/images/htb-streamio/streamio1.png
+categories:
+  - hackthebox
+  - writeup
+tags:
+  - hackthebox
+  - Windows
+  - AD
+  - Kerberos
+---
+
+# 10.10.11.158 - StreamIO
+![](/assets/images/htb-streamio/streamio.png)
+
+-----------------------
+# Part 1: Enumeración inicial
 
 Primero hacemos un escaneo de puertos, yo he utilizado un script propio, pero con nmap saldrían los mismos resultados. 
 Obtenemos una serie de puertos tipicos de directorio activo en microsoft
@@ -31,9 +53,12 @@ SMB    10.10.11.158   445   DC   [-] streamIO.htb\: STATUS_ACCESS_DENIED
 ;; ANSWER SECTION:
 streamio.htb.		3600	IN	NS	dc.streamio.htb.
 ```
+Si visitamos el portal web podemos ver la tipica web de pirateria de peliculas
+![](/assets/images/htb-streamio/streamio2.png)
 
 - Encontramos varios usuarios en la página `about.php`, creamos una lista de usuarios e intentamos por el puerto 88 ceonsguir
 al menos usuarios válidos. No conseguimos ninguno, mas que un tal "martin" a partir de un ataque por diccionario.
+![](/assets/images/htb-streamio/streamio4.png)
 ```bash
 └─$ echo -e "oliver\nbarry\nsamantha" > users.txt
 
@@ -47,7 +72,6 @@ al menos usuarios válidos. No conseguimos ninguno, mas que un tal "martin" a pa
 [*] Getting TGT for martin
 [-] User martin doesnt have UF_DONT_REQUIRE_PREAUTH set
 ```
-
 Realizamos fuzzing sobre la web principal
 ```bash
 └─$ wfuzz --hc=404 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt https://streamio.htb/FUZZ.php | grep -E "W|L"
@@ -83,7 +107,12 @@ Las paginas de /admin/ devuelven un 403 y un 200 respectivamente
 <h1>Movie managment</h1>
 Only accessable through includes    
 ```
-En cuando a `watch.streamio.htb`
+
+Tambien si vemos el certificado ssl podemos encontrar un subdominio  `watch.streamio.htb`
+![](/assets/images/htb-streamio/streamio3.png)
+El cual añadiremos al `/etc/hosts`
+![](/assets/images/htb-streamio/streamio5.png)
+
 ```bash
 └─$ wfuzz --hc=404 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt https://watch.streamio.htb/FUZZ.php | grep -E "W|L" 
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
@@ -91,11 +120,16 @@ ID           Response   Lines    Word       Chars       Payload
 000000014:   200        7193 L   19558 W    253887 Ch   "search"                                              
 000000002:   200        78 L     245 W      2829 Ch     "index"       
 ```
+La pagina de search.php nos permite hacer busqedas en una base de datos de peliculas que 
+muy probablemente sea una SQL (mssql ya que es microsoft)
+![](/assets/images/htb-streamio/streamio6.png)
+
 -----------------------------------
+# Part 2: Inyeccion SQLi
 
-## Part 2: Inyeccion SQLi
-
-Primero hacemos una inyeccion sqli en la interfaz web, luego validamos por la linea de comandos. 
+![](/assets/images/htb-streamio/streamio7.png)
+![](/assets/images/htb-streamio/streamio8.png)
+Primero hacemos una consulta en la interfaz web, luego validamos por la linea de comandos. 
 ```bash
 └─$ curl -sk 'https://watch.streamio.htb/search.php' -X POST  -H 'Content-Type: application/x-www-form-urlencoded' \
 -d 'q=Star' | html2text | grep -v "^$" 
@@ -300,6 +334,10 @@ SMB    10.10.11.158   445  DC       [-] streamIO.htb\yoshihide:66boysandgirls.. 
 └─$ rpcclient -U "yoshihide%66boysandgirls.."  10.10.11.158
 Cannot connect to server.  Error was NT_STATUS_LOGON_FAILURE
 ```
+Hasta que probamos en `login.php`
+![](/assets/images/htb-streamio/streamio8.png)
+
+
 ----------------------
 
 # Part 3: Acediendo al panel de admin
@@ -316,7 +354,8 @@ Pero si nos permite loguearnos en la pagina de admin, obtenemos su cookie de ses
 <head>
   <meta charset="utf-8">
 ...
-```  
+```
+![](/assets/images/htb-streamio/streamio9.png)
 Vemos que hay varias opciones, las cuales se traducen en parametros... no encontramos ninguno muy interesante, pero a lo
 mejor no se estan mostrando todos los posibles
 ```bash
@@ -439,5 +478,9 @@ El código PHP proporcionado realiza las siguientes acciones:
 
 (..) mas informacion sobre consultas a la base de datos
 
-Vemos que desde la web tenemos interacción con esta, haremos un favor al mundo.
+Vemos que desde la web tenemos interacción con esta base de datos
+![](/assets/images/htb-streamio/streamio10.png)
 
+Haremos un favor al mundo.
+![](/assets/images/htb-streamio/streamio11.png)
+![](/assets/images/htb-streamio/streamio12.png)
