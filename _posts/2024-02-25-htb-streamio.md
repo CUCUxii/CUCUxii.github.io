@@ -17,7 +17,7 @@ tags:
 ---
 
 # 10.10.11.158 - StreamIO
-![](/assets/images/htb-streamio/streamio.png)
+![](/assets/images/htb-streamio/streamio1.png)
 
 -----------------------
 # Part 1: Enumeración inicial
