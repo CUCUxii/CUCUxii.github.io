@@ -59,6 +59,8 @@ Si visitamos el portal web podemos ver la tipica web de pirateria de peliculas
 - Encontramos varios usuarios en la página `about.php`, creamos una lista de usuarios e intentamos por el puerto 88 ceonsguir
 al menos usuarios válidos. No conseguimos ninguno, mas que un tal "martin" a partir de un ataque por diccionario.
 ![](/assets/images/htb-streamio/streamio4.png)
+
+
 ```bash
 └─$ echo -e "oliver\nbarry\nsamantha" > users.txt
 
@@ -72,7 +74,9 @@ al menos usuarios válidos. No conseguimos ninguno, mas que un tal "martin" a pa
 [*] Getting TGT for martin
 [-] User martin doesnt have UF_DONT_REQUIRE_PREAUTH set
 ```
+
 Realizamos fuzzing sobre la web principal
+
 ```bash
 └─$ wfuzz --hc=404 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt https://streamio.htb/FUZZ.php | grep -E "W|L"
 * Wfuzz 3.1.0 - The Web Fuzzer                         *
